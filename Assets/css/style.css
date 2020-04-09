@@ -5,3 +5,7 @@ header {
     padding: 10px;
 
 }
+
+#fiveDayCard {
+    max-width: 12rem;
+}
