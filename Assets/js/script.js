@@ -1,58 +1,52 @@
 $(document).ready(function () {
 
 // global variable
-let searchedCity = [];
-
-console.log(searchedCity);
+let cityArray = JSON.parse(localStorage.getItem("city")) || [];
+// get the date with moment.js and display the date (opt to use javascript)
+let currentDate = moment().format("L");
 
 // Open the page: get history city history from local storage
     // list the all previous serached cities on the page (8 cities)
-function getCityHistory(searchCity) {
-    let cityStored = localStorage.setItem("city", searchCity);
-
-    for (let i = 0; i < 9; i++) {
-        $divSearch = $("<div>").addClass("list-group");
-        $divSearchItem = $("<div>").addClass("list-group-item");
-        $aSearch = $("<a>").attr("src", `https://openweathermap.org/find?q=${cityStored}`).text(cityStored);
-        $divSearchItem.append($aSearch);
-        $("#lastSearches").append($divSearch);
-        $divSearch.append($divSearchItem);
+function getCityHistory() {
+    if(cityArray.length > 0){
+        for (let i = 0; i < cityArray.length; i++) {
+            addCitytoPage(cityArray[i]);
+            showWeather(cityArray[i]);
+        }
     }
 }
-getCityHistory();
-   
 
-        // search the array if the city is already there before display, so don't display the same city twice
-    // get the last searched item (last item of the array) and run the API on that one
+function addCitytoPage(city){
+    $divSearch = $("<div>").addClass("list-group");
+    $divSearchItem = $("<div>").addClass("list-group-item");
+    $listSearchBtn = $("<button>").addClass("previousSearchBtn btn btn-light btn-block").attr("data-index", city).text(city);
+    $divSearchItem.append($listSearchBtn);
+    $("#lastSearches").append($divSearch);
+    $divSearch.append($divSearchItem);
 
-// click event for the city history cities (a TAG), search for the city
+    // click event for the city history cities, search for the city
+    $(".previousSearchBtn").on("click", function(e) {
+        e.preventDefault();
 
+        let clickedBtn = $(this).find('[data-index]').attr('data-index');
+        console.log(clickedBtn);
 
-// Input to Search for a city
-// search button
-$("#searchBtn").on("click", function(event) {
-    event.preventDefault();
-    
-    let searchCity = $("#locationSearched").val().trim();   
-    searchedCity.push(searchCity);
-
-    // make sure to clear the page after search
-    $("#locationSearched").val("");
-    
-    storeCity(searchCity);
-    getWeather(searchCity);
-    weatherForecast(searchCity);
-
-})
-
-    // Local storage: if not in the city list and restore the array back in local storage
-function storeCity(searchCity) {
-    localStorage.setItem("city", JSON.stringify(searchCity));
+        // showWeather(clickedBtn);
+        // let lastItem = cityArray[cityArray.length -1];
+        // console.log(lastItem);
+    })
 }
 
+function showWeather(city){
+    getWeather(city);
+    weatherForecast(city);
+    $("#weatherDisplay").show();
+}
+    // Local storage: if not in the city list and restore the array back in local storage
+function storeCity() {
+    localStorage.setItem("city", JSON.stringify(cityArray));
+}
 // search results beside the page
-    // get the date with moment.js and display the date (opt to use javascript)
-        let currentDate = moment().format("L");
 
     // api request from https://openweathermap.org/api for current weather
 function getWeather(searchCity) {
@@ -66,7 +60,7 @@ function getWeather(searchCity) {
         let longitude = response.coord.lon;
          // weather conditions for that city
         let $cityName = $("<span>").attr("id", "weather-header").text(response.name);
-        let $dateDisplay = $("<span>").text("  (" + currentDate + ")");
+        let $dateDisplay = $("<span>").attr("id", "weather-header").text("  (" + currentDate + ")");
          // icon with the weather
         let $weatherIcon = $("<img>").attr("id", "weather-icon").attr("src",
         "https://openweathermap.org/img/w/" +
@@ -90,7 +84,6 @@ function getWeather(searchCity) {
     })
 }
 
-
     // UV index (display colors: favorable, moderate, severe) (diff API call)
 function getUvIndex(latitude, longitude) {
     $.ajax({
@@ -112,11 +105,11 @@ function weatherForecast(searchCity) {
         type: "GET",
 
     }).then(function(response) {
-        $("#5dayForecast").empty();
+        $("#fiveDayForecast").empty();
         for (let i = 0; i < response.list.length; i++) {
             if (response.list[i].dt_txt.indexOf("18:00:00") !== -1) {
                 let $formattedDate = moment(response.list[i].dt_txt).format("L");
-                let $5dayDiv = $("<div>").addClass('card bg-light mb-3').attr("id", "fiveDayCard");
+                let $5dayDiv = $("<div>").addClass('card bg-primary mb-3 text-white').attr("id", "fiveDayCard");
                 let $fiveDayDate = $("<div>").text($formattedDate);
                 let $fiveDayIcon = $("<img>").attr("id", "weather-icon-sm").attr(
                     "src",
@@ -126,7 +119,7 @@ function weatherForecast(searchCity) {
                   );
                 let $fiveDayTemp = $("<p>").attr("id", "weather-description").text(`Temp: ${response.list[i].main.temp} °F`);
                 let $fiveDayHumidity = $("<p>").attr("id", "weather-description").text(`Humidity: ${response.list[i].main.humidity} %`);
-                $("#5dayForecast").append($5dayDiv);
+                $("#fiveDayForecast").append($5dayDiv);
                     $5dayDiv.append(
                     $fiveDayDate,
                     $fiveDayIcon,
@@ -138,6 +131,28 @@ function weatherForecast(searchCity) {
     })
 }
 
+$("#searchBtn").on("click", function(event) {
+    event.preventDefault();
+    
+    let searchCity = $("#locationSearched").val().trim();
+    if(searchCity === ""){
+        return
+    }
 
+    // search the array if the city is already there before display, so don't display the same city twice
+        // get the last searched item (last item of the array) and run the API on that one
+    if(cityArray.indexOf(searchCity) === -1) {
+        cityArray.push(searchCity);
+        storeCity();
+        addCitytoPage(searchCity);
+    }
+    // make sure to clear the page after search
+    $("#locationSearched").val("");
+    showWeather(searchCity);
+})
+
+$("#weatherDisplay").hide();
+
+getCityHistory();
 
 });

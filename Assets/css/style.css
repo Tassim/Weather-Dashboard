@@ -6,6 +6,44 @@ header {
 
 }
 
+body {
+    background-color: turquoise;
+    background-image: url(../img/190517040035-daily-weather-forecast-severe-storms-california-heavy-rainfall-00000011.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+}
+.card-body {
+    padding: 0;
+}
+
+.card {
+    display: grid;
+}
+.previousSearchBtn {
+    padding: 0;
+}
+
 #fiveDayCard {
-    max-width: 12rem;
+    max-width: 20%;
+    align-self: center;
+}
+
+#forecastHeader {
+    font-weight: 600;
+    font-size: 20px;
+    padding: 20px;
+}
+
+#fiveDayForecast {
+    font-weight: 350;
+    font-size: 15px;
+    text-align: center;
+}
+
+#weather-header {
+    font-weight: 600;
+    font-size: 20px;
+
 }
