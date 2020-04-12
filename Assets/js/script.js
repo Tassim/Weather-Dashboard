@@ -11,11 +11,12 @@ function getCityHistory() {
     if(cityArray.length > 0){
         for (let i = 0; i < cityArray.length; i++) {
             addCitytoPage(cityArray[i]);
-            showWeather(cityArray[i]);
         }
+        showWeather(cityArray[cityArray.length -1]);
     }
 }
 
+// function to add the list of items from previous searches on the page
 function addCitytoPage(city){
     $divSearch = $("<div>").addClass("list-group");
     $divSearchItem = $("<div>").addClass("list-group-item");
@@ -23,31 +24,14 @@ function addCitytoPage(city){
     $divSearchItem.append($listSearchBtn);
     $("#lastSearches").append($divSearch);
     $divSearch.append($divSearchItem);
-
-    // click event for the city history cities, search for the city
-    $(".previousSearchBtn").on("click", function(e) {
-        e.preventDefault();
-
-        let clickedBtn = $(this).find('[data-index]').attr('data-index');
-        console.log(clickedBtn);
-
-        // showWeather(clickedBtn);
-        // let lastItem = cityArray[cityArray.length -1];
-        // console.log(lastItem);
-    })
 }
 
-function showWeather(city){
-    getWeather(city);
-    weatherForecast(city);
-    $("#weatherDisplay").show();
-}
     // Local storage: if not in the city list and restore the array back in local storage
 function storeCity() {
     localStorage.setItem("city", JSON.stringify(cityArray));
 }
-// search results beside the page
 
+// search results beside the page
     // api request from https://openweathermap.org/api for current weather
 function getWeather(searchCity) {
     $.ajax({
@@ -92,8 +76,19 @@ function getUvIndex(latitude, longitude) {
     }).then(function(response) {
         $("currentDay").empty();
 
-        let uvIndex = $("<p>").attr("id", "uvIndex").text(`UV Index: ${response.value}`);
+        let uvIndex = $("<p>").attr("id", "uvIndex").text("UV Index: ");
+        let $uvIndexVal = $("<span>").text(response.value);
         $('#currentDay').append(uvIndex);
+        uvIndex.append($uvIndexVal);
+
+        if(response.value <= 2){
+            $uvIndexVal.attr("id", "uvIndexLow");
+        } else if (response.value >= 8) {
+            $uvIndexVal.attr("id", "uvIndexHigh");   
+        } else {
+            $uvIndexVal.attr("id", "uvIndexModerate");
+        }
+
     })
 }
 
@@ -131,6 +126,7 @@ function weatherForecast(searchCity) {
     })
 }
 
+// event listener for the click event on the search button
 $("#searchBtn").on("click", function(event) {
     event.preventDefault();
     
@@ -150,6 +146,19 @@ $("#searchBtn").on("click", function(event) {
     $("#locationSearched").val("");
     showWeather(searchCity);
 })
+
+// click event for the city history, search for the city
+$("#lastSearches").on("click", ".list-group", function(e) {
+    e.preventDefault();
+    let clickedBtn = $(this).find('[data-index]').attr('data-index');
+    showWeather(clickedBtn);
+})
+
+function showWeather(city){
+    getWeather(city);
+    weatherForecast(city);
+    $("#weatherDisplay").show();
+}
 
 $("#weatherDisplay").hide();
 
