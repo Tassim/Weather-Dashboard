@@ -71,7 +71,7 @@ function getWeather(searchCity) {
     // UV index (display colors: favorable, moderate, severe) (diff API call)
 function getUvIndex(latitude, longitude) {
     $.ajax({
-        url: `http://api.openweathermap.org/data/2.5/uvi?appid=a9fa8e4a5cdb9ab82f25d7a62cad4dc7&lat=${latitude}&lon=${longitude}`,
+        url: `https://api.openweathermap.org/data/2.5/uvi?appid=a9fa8e4a5cdb9ab82f25d7a62cad4dc7&lat=${latitude}&lon=${longitude}`,
         type: "GET",
     }).then(function(response) {
         $("currentDay").empty();
