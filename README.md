@@ -26,4 +26,4 @@ Weather dashboard with the following features:
 
 ## Screenshots
 
-![screenshot](./assets/img/screenShot.png)
+![screenshot](./Assets/img/screenShot.png)
