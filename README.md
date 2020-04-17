@@ -27,3 +27,5 @@ Weather dashboard with the following features:
 ## Screenshots
 
 ![screenshot](./Assets/img/screenShot.png)
+
+![Link to: Weather Dashboard] (https://tassim.github.io/homework6/)
